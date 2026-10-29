@@ -49,58 +49,6 @@ Keep the Node server and host tab open. The host browser owns physics, AI, score
 
 If another device cannot connect, check the printed address, allow Node through the computer's firewall on the private network, and check whether the router isolates Wi-Fi clients. No internet port forwarding is needed. The default port is 3000. Change it with `PORT=3001 npm start` on Linux/macOS, or `$env:PORT=3001; npm start` in PowerShell.
 
-## Upload to GitHub
-
-The downloadable source ZIP excludes private Site configuration, credentials, node_modules, and local Git history.
-
-1. Create a GitHub repository.
-2. Extract the ZIP and upload the **contents of the Summit-Volley folder** to the repository root. Include `index.html`, source folders, `dist`, tests, package files, server, build script, and documentation. Or use Git:
-
-   ```sh
-   git init
-   git add .
-   git commit -m "Add Summit Volley"
-   git branch -M main
-   git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
-   git push -u origin main
-   ```
-
-   Replace the example repository URL with your own.
-
-3. For a public playable page, open **Settings → Pages** in GitHub. Choose **Deploy from a branch**, **main**, and **/(root)**, then save. GitHub will provide the deployed URL.
-4. The root `index.html` already contains the built game; repository subpaths work without additional setup.
-
-**GitHub Pages runs solo and same-keyboard play. It does not run the Node/WebSocket LAN server.** For LAN, download or clone the repository, run the local server, and use its LAN address. Uploading the source to GitHub does not create an online multiplayer service.
-
-After editing source, run `npm run build` and commit the updated `index.html` and `dist/index.html`. The included GitHub Actions workflow tests and builds on pushes/pull requests; it does not modify files or deploy a server.
-
-Official reference: [What is GitHub Pages?](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
-
-## Development
-
-```sh
-npm ci
-npm test
-npm run build
-npm start
-```
-
-The build emits identical self-contained HTML files at the repository root and in `dist`. Browser dependencies are bundled. LAN connections are opened only when requested.
-
-| File | Purpose |
-| --- | --- |
-| `src/game.js` | Gameplay, movement, AI, scoring, menus |
-| `src/bindings.js`, `src/controls-ui.js` | Defaults, capture, labels, persisted controls |
-| `src/lan.js`, `src/lan-game.js` | Connections, input, snapshots, interpolation, lifecycle |
-| `src/lan-protocol.js` | Shared protocol validation |
-| `server.mjs` | Local HTTP and WebSocket room server |
-| `src/physics.js` | Gravity, trajectories, swept net/floor collision, line decisions |
-| `src/scene.js` | Court, scenery, characters, camera, effects, toon shading |
-| `src/software-renderer.js` | Compatibility 3D renderer without WebGL |
-| `src/audio.js` | Procedural Web Audio effects |
-| `src/index.html`, `src/style.css` | Responsive interface |
-| `tests/` | Controls, gameplay, physics, real-socket LAN integration tests |
-
 ## Performance and validation
 
 Low-polygon models, batched scenery, capped pixel density, and one shadow map keep GPU rendering lightweight. Low graphics disables real shadows. The software fallback uses the same 3D scene and physics with cached scenery, simpler characters, and a fixed wide camera. Physics runs at 120 Hz with bounded catch-up; LAN state is sent at up to 30 Hz.
