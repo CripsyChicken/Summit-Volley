@@ -1,0 +1,14 @@
+import { build } from 'esbuild';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+const result = await build({ entryPoints: ['src/game.js'], bundle: true, format: 'iife', minify: true, write: false, legalComments: 'inline', target: ['es2020'] });
+const template = await readFile('src/index.html', 'utf8');
+const css = await readFile('src/style.css', 'utf8');
+const license = await readFile('node_modules/three/LICENSE', 'utf8');
+const wsLicense = await readFile('node_modules/ws/LICENSE', 'utf8');
+const js = result.outputFiles[0].text.replaceAll('</script', '<\\/script');
+const html = template.replace('/* INLINE_CSS */', () => css).replace('/* INLINE_JS */', () => js).replace('</html>', () => `<!-- Bundled Three.js license:\n${license.replaceAll('--','—')}\n-->\n</html>`);
+await mkdir('dist', { recursive: true });
+await writeFile('dist/index.html', html);
+await writeFile('index.html', html);
+await writeFile('THIRD-PARTY-LICENSES.txt', `Three.js (MIT)\n\n${license}\n\nws (MIT, LAN server dependency)\n\n${wsLicense}`);
+console.log(`Built offline-capable HTML: ${(Buffer.byteLength(html) / 1024).toFixed(0)} KB`);
